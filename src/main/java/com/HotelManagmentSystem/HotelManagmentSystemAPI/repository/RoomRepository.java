@@ -1,4 +1,4 @@
-package com.HotelManagmentSystem.HotelManagmentSystemAPI.Repository;
+package com.HotelManagmentSystem.HotelManagmentSystemAPI.repository;
 
 import com.HotelManagmentSystem.HotelManagmentSystemAPI.model.Room;
 import org.springframework.data.repository.CrudRepository;

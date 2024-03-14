@@ -1,19 +1,12 @@
 package com.HotelManagmentSystem.HotelManagmentSystemAPI.controller;
 
-import com.HotelManagmentSystem.HotelManagmentSystemAPI.Repository.RoomRepository;
+import com.HotelManagmentSystem.HotelManagmentSystemAPI.repository.RoomRepository;
 import com.HotelManagmentSystem.HotelManagmentSystemAPI.model.Room;
-import com.HotelManagmentSystem.HotelManagmentSystemAPI.service.RoomService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestAttribute;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 @RestController
