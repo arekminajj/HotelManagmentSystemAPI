@@ -1,9 +1,6 @@
 package com.HotelManagmentSystem.HotelManagmentSystemAPI.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 @Entity
 public class Photo {
@@ -12,9 +9,6 @@ public class Photo {
     private int id;
     private String fileName;
     private String url;
-
-    //deleted ctors
-
 
     public int getId() {
         return id;

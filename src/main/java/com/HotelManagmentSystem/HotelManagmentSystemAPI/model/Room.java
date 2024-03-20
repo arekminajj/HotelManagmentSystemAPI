@@ -2,14 +2,12 @@ package com.HotelManagmentSystem.HotelManagmentSystemAPI.model;
 
 import jakarta.persistence.*;
 
-import java.util.List;
 import java.util.Set;
 
 import jakarta.persistence.Entity;
 
 @Entity
 public class Room {
-
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
@@ -18,10 +16,8 @@ public class Room {
     private int price;
     private String description;
     private int capacity;
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Set<Photo> photos;
-
-    //deleted ctors
 
     public int getId() {
         return id;
