@@ -23,7 +23,7 @@ public class BookingController {
     @Autowired
     private RoomRepository roomRepository;
 
-    @GetMapping(path="/all")
+    @GetMapping(path = "/all")
     public ResponseEntity<Iterable<Booking>> getAlBookings() {
         Iterable<Booking> bookings = bookingRepository.findAll();
         return new ResponseEntity<Iterable<Booking>>(bookings, HttpStatus.OK);
@@ -32,87 +32,100 @@ public class BookingController {
 
     //TODO: make it return message when throwing exception.
     //TODO: need two exception messages a) room doesnt exit b) room already booked for the date.
-    @PostMapping(path="/add")
+    @PostMapping(path = "/add")
     public ResponseEntity<Booking> addNewBooking(@RequestBody Booking booking) {
         int requestedRoomId = booking.getRoomId();
         Optional<Room> requestedRoomOptional = roomRepository.findById(requestedRoomId);
         List<Booking> bookings = bookingRepository.findByRoomId(requestedRoomId);
-        //sprawdza czy w ogole jest pokoj o takim id w hotelu
-        if (requestedRoomOptional.isPresent()) {
-            for (Booking iterableBooking : bookings) {
-                // sprawdza czy pokoj nie jest zajety
-                if(checkDateOverlap(
-                        booking.getCheckInDate(),
-                        booking.getCheckOutDate(),
-                        iterableBooking.getCheckInDate(),
-                        iterableBooking.getCheckOutDate())) {
-                    throw new BadRequestException();
-                }
-            }
 
-            Booking savedBooking = bookingRepository.save(booking);
-            return ResponseEntity.status(HttpStatus.CREATED).body(savedBooking);
+        if (doesRoomExist(requestedRoomOptional)) {
+            if (canBeBooked(bookings, booking)) {
+                Booking savedBooking = bookingRepository.save(booking);
+                return ResponseEntity.status(HttpStatus.CREATED).body(savedBooking);
+            }
+            else{
+                throw new BadRequestException("Room is alreadu booked for the date");
+            }
         }
         else {
-        throw new BadRequestException();
+            throw new BadRequestException("Room does not exits.");
         }
-        //todo: make sure room isnt already booked for the time specified in the req;
-        //todo: also throw exception if room doesnt exist
-
     }
 
-    @GetMapping(path="/{id}")
+    @GetMapping(path = "/{id}")
     public ResponseEntity<Booking> GetBookingById(@PathVariable int id) {
         Optional<Booking> bookingOptional = bookingRepository.findById(id);
 
         if (bookingOptional.isPresent()) {
             return ResponseEntity.ok(bookingOptional.get());
         } else {
-            throw new NotFoundException();
+            throw new NotFoundException("Booking with the id of: " + id + "does not exist.");
         }
     }
 
-    @PutMapping(path="/{id}")
-    public ResponseEntity<Booking> updateBooking(@RequestBody Booking updatedBooking,@PathVariable int id)
-    {
+    @PutMapping(path = "/{id}")
+    public ResponseEntity<Booking> updateBooking(@RequestBody Booking updatedBooking, @PathVariable int id) {
         Optional<Booking> existingBookingOptional = bookingRepository.findById(id);
+        int requestedRoomId = updatedBooking.getRoomId();
+        Optional<Room> requestedRoomOptional = roomRepository.findById(requestedRoomId);
+        List<Booking> bookings = bookingRepository.findByRoomId(requestedRoomId);
 
-        if (existingBookingOptional.isPresent()) {
-            Booking existingBooking = existingBookingOptional.get();;
+        if(doesRoomExist(requestedRoomOptional)) {
+            if(canBeBooked(bookings, updatedBooking)) {
+                Booking existingBooking = existingBookingOptional.get();
 
-            existingBooking.setCheckInDate(updatedBooking.getCheckInDate());
-            existingBooking.setCheckOutDate(updatedBooking.getCheckOutDate());
-            existingBooking.setGuest(updatedBooking.getGuest());
-            existingBooking.setRoomId(updatedBooking.getRoomId());
-            existingBooking.setNumberOfGuests(updatedBooking.getNumberOfGuests());
+                existingBooking.setCheckInDate(updatedBooking.getCheckInDate());
+                existingBooking.setCheckOutDate(updatedBooking.getCheckOutDate());
+                existingBooking.setGuest(updatedBooking.getGuest());
+                existingBooking.setRoomId(updatedBooking.getRoomId());
+                existingBooking.setNumberOfGuests(updatedBooking.getNumberOfGuests());
 
-            //todo: make sure room isnt already booked for the time specified in the req;
-            //todo: also throw exception if room doesnt exist
-
-            Booking savedBooking = bookingRepository.save(existingBooking);
-            return ResponseEntity.ok(savedBooking);
-        } else {
-            throw new BadRequestException();
-        }
-    }
-
-    @DeleteMapping(path="/{id}")
-    public ResponseEntity<String> deleteBooking(@PathVariable int id) {
-        Optional<Booking> bookingOptional = bookingRepository.findById(id);
-        if(bookingOptional.isPresent()) {
-            bookingRepository.deleteById(id);
-            return ResponseEntity.ok("Booking of id: " + id + " has been deleted");
+                Booking savedBooking = bookingRepository.save(existingBooking);
+                return ResponseEntity.ok(savedBooking);
+            }
+            else {
+                throw new BadRequestException("Room is alreadu booked for the date");
+            }
         }
         else {
-            throw new BadRequestException();
+            throw new BadRequestException("Room does not exist");
         }
     }
 
-    public static boolean checkDateOverlap(LocalDate startDate1, LocalDate endDate1, LocalDate startDate2, LocalDate endDate2) {
+    @DeleteMapping(path = "/{id}")
+    public ResponseEntity<String> deleteBooking(@PathVariable int id) {
+        Optional<Booking> bookingOptional = bookingRepository.findById(id);
+        if (bookingOptional.isPresent()) {
+            bookingRepository.deleteById(id);
+            return ResponseEntity.ok("Booking of id: " + id + " has been deleted");
+        } else {
+            throw new BadRequestException("Requested room does not exist.");
+        }
+    }
+
+    private static boolean checkDateOverlap(LocalDate startDate1, LocalDate endDate1, LocalDate startDate2, LocalDate endDate2) {
         if (endDate1.isBefore(startDate2) || startDate1.isAfter(endDate2)) {
             return false;
         } else {
             return true;
         }
+    }
+
+    private boolean doesRoomExist(Optional<Room> requestedRoomOptional) {
+        return requestedRoomOptional.isPresent();
+    }
+
+    private boolean canBeBooked(List<Booking> bookings, Booking booking) {
+        for (Booking iterableBooking : bookings) {
+            // sprawdza czy pokoj nie jest zajety
+            if (checkDateOverlap(
+                    booking.getCheckInDate(),
+                    booking.getCheckOutDate(),
+                    iterableBooking.getCheckInDate(),
+                    iterableBooking.getCheckOutDate())) {
+                return false;
+            }
+        }
+        return true;
     }
 }

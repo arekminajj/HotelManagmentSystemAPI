@@ -32,7 +32,7 @@ public class RoomController {
         if (roomOptional.isPresent()) {
             return ResponseEntity.ok(roomOptional.get());
         } else {
-            throw new NotFoundException();
+            throw new NotFoundException("Room with the id of: " + id + "does not exist.");
         }
     }
 
@@ -59,7 +59,7 @@ public class RoomController {
             Room savedRoom = roomRepository.save(existingRoom);
             return ResponseEntity.ok(savedRoom);
         } else {
-            throw new BadRequestException();
+            throw new BadRequestException("Requested room does not exist");
         }
     }
     @DeleteMapping(path="/{id}")
@@ -70,7 +70,7 @@ public class RoomController {
             return ResponseEntity.ok("Room of id: " + id + " has been deleted");
         }
         else {
-            throw new BadRequestException();
+            throw new BadRequestException("Requested room does not exist.");
         }
     }
 }
