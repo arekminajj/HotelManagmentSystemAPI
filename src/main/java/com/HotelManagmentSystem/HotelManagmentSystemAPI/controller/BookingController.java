@@ -29,9 +29,6 @@ public class BookingController {
         return new ResponseEntity<Iterable<Booking>>(bookings, HttpStatus.OK);
     }
 
-
-    //TODO: make it return message when throwing exception.
-    //TODO: need two exception messages a) room doesnt exit b) room already booked for the date.
     @PostMapping(path = "/add")
     public ResponseEntity<Booking> addNewBooking(@RequestBody Booking booking) {
         int requestedRoomId = booking.getRoomId();
