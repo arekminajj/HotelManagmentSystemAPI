@@ -1,7 +1,7 @@
 package com.HotelManagmentSystem.HotelManagmentSystemAPI.controller;
 
-import com.HotelManagmentSystem.HotelManagmentSystemAPI.Exceptions.BadRequestException;
-import com.HotelManagmentSystem.HotelManagmentSystemAPI.Exceptions.NotFoundException;
+import com.HotelManagmentSystem.HotelManagmentSystemAPI.exceptions.BadRequestException;
+import com.HotelManagmentSystem.HotelManagmentSystemAPI.exceptions.NotFoundException;
 import com.HotelManagmentSystem.HotelManagmentSystemAPI.repository.RoomRepository;
 import com.HotelManagmentSystem.HotelManagmentSystemAPI.model.Room;
 import org.springframework.beans.factory.annotation.Autowired;

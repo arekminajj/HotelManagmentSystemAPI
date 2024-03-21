@@ -1,4 +1,4 @@
-package com.HotelManagmentSystem.HotelManagmentSystemAPI.Exceptions;
+package com.HotelManagmentSystem.HotelManagmentSystemAPI.exceptions;
 
 
 import org.springframework.http.HttpStatus;
