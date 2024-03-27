@@ -2,6 +2,9 @@ package com.HotelManagmentSystem.HotelManagmentSystemAPI.controller;
 
 import com.HotelManagmentSystem.HotelManagmentSystemAPI.exceptions.BadRequestException;
 import com.HotelManagmentSystem.HotelManagmentSystemAPI.exceptions.NotFoundException;
+import com.HotelManagmentSystem.HotelManagmentSystemAPI.model.Term;
+import com.HotelManagmentSystem.HotelManagmentSystemAPI.model.Booking;
+import com.HotelManagmentSystem.HotelManagmentSystemAPI.repository.BookingRepository;
 import com.HotelManagmentSystem.HotelManagmentSystemAPI.repository.RoomRepository;
 import com.HotelManagmentSystem.HotelManagmentSystemAPI.model.Room;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,15 +12,21 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+
+//TODO: ADD getAllFreeRooms(startdate, enddate);
 
 @RestController
 @RequestMapping(path="/room")
 public class RoomController {
 
-    //private RoomService roomService;
     @Autowired
     private RoomRepository roomRepository;
+
+    @Autowired
+    private BookingRepository bookingRepository;
 
     @GetMapping(path="/all")
     public ResponseEntity<Iterable<Room>> getAlRooms() {
@@ -34,6 +43,21 @@ public class RoomController {
         } else {
             throw new NotFoundException("Room with the id of: " + id + "does not exist.");
         }
+    }
+
+    @GetMapping(path="/booked/{id}")
+    public ResponseEntity<List<Term>>GetRoomBookedTerms(@PathVariable int id) {
+        List<Booking> bookings = bookingRepository.findByRoomId(id);
+        List<Term> bookedTerms = new ArrayList<Term>();
+
+        for (Booking booking : bookings) {
+            Term term = new Term(booking.getRoomId(), booking.getCheckInDate(), booking.getCheckOutDate());
+            bookedTerms.add(term);
+        }
+
+        //Moglbym dodac excepcje dla nieistniejacego pokoju ale spowololni to dosc program
+
+        return ResponseEntity.status(HttpStatus.OK).body(bookedTerms);
     }
 
     @PostMapping(path="/add") // Map ONLY POST Requests
