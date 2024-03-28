@@ -12,11 +12,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
-//TODO: ADD getAllFreeRooms(startdate, enddate);
 
 @RestController
 @RequestMapping(path="/room")
@@ -60,6 +59,28 @@ public class RoomController {
         return ResponseEntity.status(HttpStatus.OK).body(bookedTerms);
     }
 
+    @GetMapping(path="free")
+    public ResponseEntity<List<Room>>getFreeRoomsForTerm(@RequestParam LocalDate startDate, @RequestParam LocalDate endDate) {
+        Iterable<Room> rooms = roomRepository.findAll();
+        List<Room> freeRooms = new ArrayList<Room>();
+
+        for(Room room : rooms) {
+                List<Booking> roomBookings = bookingRepository.findByRoomId(room.getId());
+                boolean canBeAdded = true;
+                for(Booking booking : roomBookings) {
+                    if(checkDateOverlap(startDate, endDate, booking.getCheckInDate(), booking.getCheckOutDate())) {
+                        canBeAdded = false;
+                    }
+                    
+                }
+                if(canBeAdded) {
+                    freeRooms.add(room);
+                }
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(freeRooms);
+    }
+
     @PostMapping(path="/add") // Map ONLY POST Requests
     public ResponseEntity<Room> addNewRoom(@RequestBody Room room) {
         Room savedRoom = roomRepository.save(room);
@@ -86,6 +107,7 @@ public class RoomController {
             throw new BadRequestException("Requested room does not exist");
         }
     }
+
     @DeleteMapping(path="/{id}")
     public ResponseEntity<String> deleteRoom(@PathVariable int id) {
         Optional<Room> roomOptional = roomRepository.findById(id);
@@ -95,6 +117,14 @@ public class RoomController {
         }
         else {
             throw new BadRequestException("Requested room does not exist.");
+        }
+    }
+
+    private static boolean checkDateOverlap(LocalDate startDate1, LocalDate endDate1, LocalDate startDate2, LocalDate endDate2) {
+        if (endDate1.isBefore(startDate2) || startDate1.isAfter(endDate2)) {
+            return false;
+        } else {
+            return true;
         }
     }
 }
