@@ -85,7 +85,6 @@ Adds a new room to the hotel.
 
 ```
 POST /room/add HTTP/1.1
-Host: your-base-url.com
 Content-Type: application/json
 
 {
@@ -122,7 +121,6 @@ Updates the details of an existing room.
 
 ```
 PUT /room/123 HTTP/1.1
-Host: your-base-url.com
 Content-Type: application/json
 
 {
