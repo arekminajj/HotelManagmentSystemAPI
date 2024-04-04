@@ -54,6 +54,11 @@ public class RoomController {
             bookedTerms.add(term);
         }
 
+        if(bookedTerms.isEmpty()) {
+            throw new BadRequestException(
+                "Room of given id doesn't exit");
+        }
+
         //Moglbym dodac excepcje dla nieistniejacego pokoju ale spowololni to dosc program
 
         return ResponseEntity.status(HttpStatus.OK).body(bookedTerms);
