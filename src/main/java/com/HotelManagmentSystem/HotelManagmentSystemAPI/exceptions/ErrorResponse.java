@@ -9,7 +9,6 @@ public class ErrorResponse {
         this.message = message;
     }
 
-    // Getters and setters
     public String getError() {
         return error;
     }
